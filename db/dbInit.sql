@@ -10,15 +10,16 @@ drop table if exists Vaccination_Centre;
 drop table if exists Vaccine_Type;
 drop table if exists News;
 
-create or replace table Hospital (
+create table Hospital (
     ID integer primary key  auto_increment,
     name varchar(256) not null,
-    address varchar(256) not null,
+    address varchar(256) not null
 
-    constraint unique (name, address)
+#     constraint unique (name, address)
 );
+alter table Hospital add constraint unique (name, address);
 
-create or replace  table Hospital_Opinion (
+create    table Hospital_Opinion (
     ID integer primary key auto_increment,
 
     title varchar(64) not null unique ,
@@ -30,7 +31,7 @@ create or replace  table Hospital_Opinion (
                               Hospital(ID) on delete cascade
 );
 
-create or replace  table Hospital_Admission (
+create table Hospital_Admission (
     ID integer primary key auto_increment,
 
     admitted integer default 0,
@@ -38,15 +39,15 @@ create or replace  table Hospital_Admission (
 
     hospital_ID integer not null,
 
-    entry_date datetime default sysdate(),
+    entry_date datetime,
 
-    constraint unique (hospital_ID, entry_date),
 
     constraint foreign key hospital_admission_valid_h_ID(hospital_ID) references
                                  Hospital(ID) on delete cascade
 );
+    alter table Hospital_Admission add constraint unique (hospital_ID, entry_date)
 
-create or replace  table Vaccine_Type (
+create    table Vaccine_Type (
     ID integer primary key  not null auto_increment,
     name varchar(64) unique not null
 );
@@ -55,7 +56,7 @@ insert into Vaccine_Type (name) values
 ('Astra-Zenneca'), ('Pfizer'), ('Moderna');
 
 
-create or replace  table Vaccination_Centre (
+create    table Vaccination_Centre (
     ID integer primary key auto_increment,
 
     address varchar(256) not null unique,
@@ -67,7 +68,7 @@ create or replace  table Vaccination_Centre (
                                 Vaccine_Type(ID) on delete cascade
 );
 
-create or replace  table Vaccination_Appointment (
+create    table Vaccination_Appointment (
     ID integer primary key auto_increment,
 
     person_name varchar(128) unique not null ,
@@ -80,7 +81,7 @@ create or replace  table Vaccination_Appointment (
 );
 
 
-create or replace  table News (
+create    table News (
     ID integer primary key auto_increment,
 
     title varchar(128) unique not null,
