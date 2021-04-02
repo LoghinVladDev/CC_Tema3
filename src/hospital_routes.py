@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from mysql import connector
+from src.dbconn import get_db_connection
 
 
 simple_page_2 = Blueprint('simple_page_2', __name__, template_folder='templates')
@@ -8,12 +8,7 @@ simple_page_2 = Blueprint('simple_page_2', __name__, template_folder='templates'
 @simple_page_2.route('/hospital', methods = ["GET", "POST"])
 def hospital():
     if request.method == "GET":
-        connection=connector.connect(
-            host = "localhost",
-            user = "covid-19-user",
-            password = "covid-19-pass",
-            db = "CC_T3"
-        )
+        connection=get_db_connection()
         cursor = connection.cursor()
         try:
             cursor.execute("select * from Hospital")
@@ -26,12 +21,7 @@ def hospital():
         return response
 
     if request.method == 'POST':
-        connection=connector.connect(
-            host = "localhost",
-            user = "covid-19-user",
-            password = "covid-19-pass",
-            db = "CC_T3"
-        )
+        connection=get_db_connection()
         name = request.form['name']
         address = request.form['address']
         cursor = connection.cursor()
@@ -49,12 +39,7 @@ def hospital():
 
 @simple_page_2.route('/hospital/<string:name>')
 def get_hospital_name(name):
-    connection = connector.connect(
-        host="localhost",
-        user="covid-19-user",
-        password="covid-19-pass",
-        db="CC_T3"
-    )
+    connection=get_db_connection()
     cursor = connection.cursor()
     cursor.execute("select * from Hospital where name = %s", (name,))
     response = jsonify(cursor.fetchall())
@@ -64,13 +49,8 @@ def get_hospital_name(name):
 
 
 @simple_page_2.route('/hospital/<int:id>')
-def get_hospital_id(id):
-    connection=connector.connect(
-        host = "localhost",
-        user = "covid-19-user",
-        password = "covid-19-pass",
-        db = "CC_T3"
-    )
+def get_hospial_id(id):
+    connection=get_db_connection()
     cursor = connection.cursor(prepared=True)
     try:
         cursor.execute("select * from Hospital where Hospital.ID = %s ", (int(id),))

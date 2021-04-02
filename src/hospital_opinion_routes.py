@@ -2,16 +2,15 @@ from flask import Blueprint, jsonify, request
 from src.dbconn import get_db_connection
 
 
-simple_page_3 = Blueprint('simple_page_3', __name__, template_folder='templates')
+simple_page_6 = Blueprint('simple_page_6', __name__, template_folder='templates')
 
-
-@simple_page_3.route('/vaccination_centre', methods = ["GET", "POST"])
-def vaccination_centre():
+@simple_page_6.route('/hospital_opinion', methods = ["GET", "POST"])
+def hospital_admission():
     if request.method == "GET":
-        connection=get_db_connection()
+        connection = get_db_connection()
         cursor = connection.cursor()
         try:
-            cursor.execute("select * from Vaccination_Centre")
+            cursor.execute("select * from Hospital_Opinion")
             response = jsonify(cursor.fetchall())
         except Exception as e:
             response = jsonify({"status": "failure"})
@@ -22,28 +21,30 @@ def vaccination_centre():
 
     if request.method == 'POST':
         connection=get_db_connection()
-        address = request.form['address']
-        dose_count = request.form['dose_count']
-        dose_type_ID = request.form['dose_type_ID']
         cursor = connection.cursor()
         try:
-            cursor.execute("insert into Vaccination_Centre (address, dose_count, dose_type_ID) values (%s, %s, %s)",(address, dose_count, dose_type_ID))
+            query_params = (
+            request.form['title'], request.form['message'],
+            request.form['hospital_ID'])
+            cursor.execute(
+                "insert into Hospital_Opinion (title, message, hospital_ID) values (%s, "
+                "%s, %s)", query_params)
             connection.commit()
             response = jsonify({"status": "success"})
         except Exception as e:
-            response = jsonify({"status":"failure"})
+            response = jsonify({"status": "failure", 'msg': str(e)})
             print(e)
         cursor.close()
         connection.close()
         return response
 
 
-@simple_page_3.route('/vaccination_centre/<string:address>')
-def get_vaccination_centre_address(address):
-    connection=get_db_connection()
-    cursor = connection.cursor(prepared=True)
+@simple_page_6.route('/hospital_opinion/<string:title>')
+def get_hospital_opinion_title(title):
+    connection = get_db_connection()
+    cursor = connection.cursor()
     try:
-        cursor.execute("select * from Vaccination_Centre where Vaccination_Centre.address = %s ",(address,))
+        cursor.execute("select * from Hospital_Opinion where title = %s", (title,))
         response = jsonify(cursor.fetchall())
     except Exception as e:
         response = jsonify({"status": "failure"})
@@ -53,12 +54,12 @@ def get_vaccination_centre_address(address):
     return response
 
 
-@simple_page_3.route('/vaccination_centre/<int:id>')
-def get_vaccination_centre_id(id):
+@simple_page_6.route('/hospital_opinion/<int:id>')
+def get_hospial_admission_id(id):
     connection=get_db_connection()
     cursor = connection.cursor(prepared=True)
     try:
-        cursor.execute("select * from Vaccination_Centre where Vaccination_Centre.ID = %s ", (int(id),))
+        cursor.execute("select * from Hospital_Opinion where hospital_ID = %s ", (int(id),))
         response = jsonify(cursor.fetchall())
     except Exception as e:
         response = jsonify({"status": "failure"})
