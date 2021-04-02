@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from src.dbconn import get_db_connection
 from src.translation_api import translate_text
+from src.sentiment_api import analyze
 
 simple_page_6 = Blueprint('simple_page_6', __name__, template_folder='templates')
 
@@ -76,6 +77,21 @@ def get_hospial_admission_id_translated(id, language):
     try:
         cursor.execute("select * from Hospital_Opinion where hospital_ID = %s ", (int(id),))
         response = jsonify(translate_text(language, str(cursor.fetchall()).replace("'", "")))
+    except Exception as e:
+        response = jsonify({"status": "failure"})
+        print(e)
+    cursor.close()
+    connection.close()
+    return response
+
+
+@simple_page_6.route('/sentiments/<int:id>')
+def get_hospital_opinion_sentiments(id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute("select message from Hospital_Opinion where hospital_ID = %s", (id,))
+        response = analyze(str(translate_text('en', str(cursor.fetchall()).replace("'", ""))['translation']))
     except Exception as e:
         response = jsonify({"status": "failure"})
         print(e)
