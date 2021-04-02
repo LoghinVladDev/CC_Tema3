@@ -35,13 +35,13 @@ def get_news_title(title):
     return response
 
 
-@simple_page.route('/news/<string:title>/translate/<string:language>')
-def get_news_title_translated(title, language):
+@simple_page.route('/news/<int:id>/translate/<string:language>')
+def get_news_id_translated(id, language):
     connection=get_db_connection()
     cursor = connection.cursor()
     try:
-        cursor.execute("select * from News where title = %s", (title,))
-        response = jsonify(translate_text(language, str(cursor.fetchall())))
+        cursor.execute("select * from News where ID = %s", (id,))
+        response = jsonify(translate_text(language, str(cursor.fetchall()).replace("'", "")))
     except Exception as e:
         response = jsonify({"status": "failure"})
         print(e)
