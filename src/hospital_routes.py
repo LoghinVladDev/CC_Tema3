@@ -2,10 +2,11 @@ from flask import Blueprint, jsonify, request
 from mysql import connector
 
 
-simple_page = Blueprint('simple_page', __name__, template_folder='templates')
+simple_page_2 = Blueprint('simple_page_2', __name__, template_folder='templates')
 
-@simple_page.route('/hospital', methods = ["GET", "POST"])
-def push_news():
+
+@simple_page_2.route('/hospital', methods = ["GET", "POST"])
+def hospital():
     if request.method == "GET":
         connection=connector.connect(
             host = "localhost",
@@ -28,10 +29,10 @@ def push_news():
             db = "CC_T3"
         )
         name = request.form['name']
-        adress = request.form['adress']
+        address = request.form['address']
         cursor = connection.cursor()
         try:
-            cursor.execute("insert into Hospital (name, adress) values (%s, %s)",(name, adress))
+            cursor.execute("insert into Hospital (name, address) values (%s, %s)",(name, address))
             connection.commit()
             response = jsonify({"status": "success"})
         except Exception as e:
@@ -41,17 +42,18 @@ def push_news():
         connection.close()
         return response
 
-    @simple_page.route('/hospital/<string:name>')
-    def get_news_title(name):
-        connection = connector.connect(
-            host="localhost",
-            user="covid-19-user",
-            password="covid-19-pass",
-            db="CC_T3"
-        )
-        cursor = connection.cursor()
-        cursor.execute("select * from News where title = %s", (name,))
-        response = jsonify(cursor.fetchall())
-        cursor.close()
-        connection.close()
-        return response
+
+@simple_page_2.route('/hospital/<string:name>')
+def get_hospital_name(name):
+    connection = connector.connect(
+        host="localhost",
+        user="covid-19-user",
+        password="covid-19-pass",
+        db="CC_T3"
+    )
+    cursor = connection.cursor()
+    cursor.execute("select * from News where title = %s", (name,))
+    response = jsonify(cursor.fetchall())
+    cursor.close()
+    connection.close()
+    return response

@@ -14,12 +14,11 @@ def get_news_id(id):
     )
     cursor = connection.cursor(prepared=True)
     try:
-        print(id)
         cursor.execute("select * from News where News.ID = %s ", (int(id),))
         response = jsonify(cursor.fetchall())
     except Exception as e:
         response = jsonify({"status": "failure"})
-        print(cursor.statement)
+        print(e)
     cursor.close()
     connection.close()
     return response
@@ -34,15 +33,19 @@ def get_news_title(title):
         db = "CC_T3"
     )
     cursor = connection.cursor()
-    cursor.execute("select * from News where title = %s", (title,))
-    response = jsonify(cursor.fetchall())
+    try:
+        cursor.execute("select * from News where title = %s", (title,))
+        response = jsonify(cursor.fetchall())
+    except Exception as e:
+        response = jsonify({"status": "failure"})
+        print(e)
     cursor.close()
     connection.close()
     return response
 
 
 @simple_page.route('/news', methods = ["GET", "POST"])
-def push_news():
+def news():
     if request.method == "GET":
         connection=connector.connect(
             host = "localhost",
@@ -51,8 +54,12 @@ def push_news():
             db = "CC_T3"
         )
         cursor = connection.cursor()
-        cursor.execute("select * from News")
-        response = jsonify(cursor.fetchall())
+        try:
+            cursor.execute("select * from News")
+            response = jsonify(cursor.fetchall())
+        except Exception as e:
+            response = jsonify({"status": "failure"})
+            print(e)
         cursor.close()
         connection.close()
         return response
@@ -77,3 +84,4 @@ def push_news():
         cursor.close()
         connection.close()
         return response
+
