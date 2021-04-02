@@ -2,11 +2,11 @@ from flask import Blueprint, jsonify, request
 from mysql import connector
 
 
-simple_page_2 = Blueprint('simple_page_2', __name__, template_folder='templates')
+simple_page_4 = Blueprint('simple_page_4', __name__, template_folder='templates')
 
 
-@simple_page_2.route('/hospital', methods = ["GET", "POST"])
-def hospital():
+@simple_page_4.route('/vaccination_appointment', methods = ["GET", "POST"])
+def vaccination_appointment():
     if request.method == "GET":
         connection=connector.connect(
             host = "localhost",
@@ -16,7 +16,7 @@ def hospital():
         )
         cursor = connection.cursor()
         try:
-            cursor.execute("select * from Hospital")
+            cursor.execute("select * from Vaccination_Appointment")
             response = jsonify(cursor.fetchall())
         except Exception as e:
             response = jsonify({"status": "failure"})
@@ -32,11 +32,12 @@ def hospital():
             password = "covid-19-pass",
             db = "CC_T3"
         )
-        name = request.form['name']
-        address = request.form['address']
+        person_name = request.form['person_name']
+        app_date = request.form['add_date']
+        vacc_centre_ID = request.form['vacc_centre_ID']
         cursor = connection.cursor()
         try:
-            cursor.execute("insert into Hospital (name, address) values (%s, %s)",(name, address))
+            cursor.execute("insert into Vaccination_Appointment (person_name, app_date, vacc_centre_ID) values (%s, %s, %s)",(person_name, app_date, vacc_centre_ID))
             connection.commit()
             response = jsonify({"status": "success"})
         except Exception as e:
@@ -47,33 +48,17 @@ def hospital():
         return response
 
 
-@simple_page_2.route('/hospital/<string:name>')
-def get_hospital_name(name):
-    connection = connector.connect(
-        host="localhost",
-        user="covid-19-user",
-        password="covid-19-pass",
-        db="CC_T3"
-    )
-    cursor = connection.cursor()
-    cursor.execute("select * from Hospital where name = %s", (name,))
-    response = jsonify(cursor.fetchall())
-    cursor.close()
-    connection.close()
-    return response
-
-
-@simple_page_2.route('/hospital/<int:id>')
-def get_hospital_id(id):
+@simple_page_4.route('/vaccination_appointment/<string:person_name>')
+def get_vaccination_appontment_name(person_name):
     connection=connector.connect(
         host = "localhost",
         user = "covid-19-user",
         password = "covid-19-pass",
         db = "CC_T3"
     )
-    cursor = connection.cursor(prepared=True)
+    cursor = connection.cursor()
     try:
-        cursor.execute("select * from Hospital where Hospital.ID = %s ", (int(id),))
+        cursor.execute("select * from Vaccination_Appointment where person_name = %s", (person_name,))
         response = jsonify(cursor.fetchall())
     except Exception as e:
         response = jsonify({"status": "failure"})
