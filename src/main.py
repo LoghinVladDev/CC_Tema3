@@ -12,7 +12,12 @@ def hello_world():
     return 'Hello World!'
 
 
+@app.route('/ciao')
+def hey():
+    return 'jajaj'
+
+
 if __name__ == '__main__':
-    app.run()
-    app.register_blueprint(simple_page)
+    app.run(debug=True)
+    # app.register_blueprint(simple_page)
     app.register_blueprint(simple_page_2)
