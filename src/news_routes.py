@@ -1,9 +1,12 @@
 from flask import Blueprint, jsonify, request
+
+from src import translation_api, sentiment_api, text_to_speech_api
 from src.dbconn import get_db_connection
-from src.translation_api import translate_text
 
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
+simple_page8 = Blueprint('simple_page8', __name__, template_folder='templates')
+
 
 @simple_page.route('/news/<int:id>')
 def get_news_id(id):
@@ -50,11 +53,6 @@ def get_news_id_translated(id, language):
     return response
 
 
-@simple_page.route('/translate', methods=["POST"])
-def translate():
-     language = request.form['language']
-     input_text = request.form['text']
-     return translate_text(language, input_text)
 
 
 @simple_page.route('/news', methods = ["GET", "POST"])
@@ -87,4 +85,30 @@ def news():
         cursor.close()
         connection.close()
         return response
+
+
+@simple_page.route('/translate', methods=["POST"])
+def translate():
+    language = request.form['language']
+    input_text = request.form['text']
+    return translation_api.translate_text(language, input_text)
+
+
+@simple_page.route('/sentiment', methods=["POST"])
+def get_sentiment():
+    input_text = request.form['text']
+    analysis = sentiment_api.analyze(input_text)
+    return jsonify(analysis)
+
+
+@simple_page.route('/texttospeech', methods=["POST"])
+def texttospeech():
+    try:
+        input_text = request.form['text']
+        file_name = request.form['filename']
+        audio_binary = text_to_speech_api.get_text_as_speech_binary(input_text, 'output')
+        response = jsonify({"status": "success"})
+    except Exception as e:
+        response = jsonify({"status": "failure", 'message': str(e)})
+    return response
 
