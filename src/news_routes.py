@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
 from mysql import connector
-import json
 
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
