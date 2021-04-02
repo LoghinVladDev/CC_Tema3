@@ -33,7 +33,7 @@ def vaccination_appointment():
             db = "CC_T3"
         )
         person_name = request.form['person_name']
-        app_date = request.form['add_date']
+        app_date = request.form['app_date']
         vacc_centre_ID = request.form['vacc_centre_ID']
         cursor = connection.cursor()
         try:
