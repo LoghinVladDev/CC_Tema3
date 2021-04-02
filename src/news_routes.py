@@ -84,3 +84,7 @@ def news():
         cursor.close()
         connection.close()
         return response
+
+
+
+
